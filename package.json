@@ -12,7 +12,8 @@
     "dev:web": "npm run dev --workspace @multivisons/web",
     "dev:worker": "npm run dev --workspace @multivisons/worker",
     "build": "npm run build --workspace @multivisons/web",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "paypal:check": "node --env-file-if-exists=.env packages/payments/scripts/paypal-capability-check.ts"
   },
   "engines": {
     "node": ">=24 <25",
