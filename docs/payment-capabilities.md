@@ -1,6 +1,6 @@
 # Payment capabilities (verified in sandbox)
 
-Status: **not yet verified.** Fill this in after following [`payment-sandbox-setup.md`](payment-sandbox-setup.md).
+Status: **verified in sandbox on 2026-11-03** (authorize, capture, void). Reproduce with [`payment-sandbox-setup.md`](payment-sandbox-setup.md).
 
 Record sandbox IDs only. Never record a client secret, an access token or buyer personal data.
 
@@ -13,27 +13,33 @@ Rejected: delayed disbursement (needs PayPal partner approval).
 ## Environment
 
 - Host: `https://api-m.sandbox.paypal.com`
-- Date verified:
-- Sandbox Business (payee / worker) account: `sb-...@business.example.com`
-- Sandbox Personal (payer / client) account: `sb-...@personal.example.com`
+- Date verified: 2026-11-03 (run `a107ca8e-4883-479c-967a-3a43328a93b1`, started 07:26:25 UTC)
+- Sandbox Business (payee / worker) account: `sb-kdvpr53571041@business.example.com` (region SG)
+- Sandbox Personal (payer / client) account: `sb-muyj4753693117@personal.example.com` (region US)
+- Buyer funding source used: sandbox bank account (CREDIT UNION 1)
 
 ## Capability check run
 
-Paste the table printed by `npm run paypal:check -- finish` here.
+Output of `npm run paypal:check -- finish`. Statuses were read back with GET after the calls.
 
 | Order | Object | Sandbox ID | Status read back by GET |
 | --- | --- | --- | --- |
-| | | | |
+| A (capture) | Order | `0MN69273EH8575307` | COMPLETED |
+| A (capture) | Authorization | `2UJ38185YS264725R` | CAPTURED (expires 2026-12-02T07:33:53Z) |
+| A (capture) | Capture | `2UW154673B305112R` | COMPLETED, gross 40.00, fee 1.66, net 38.34 |
+| B (void) | Order | `6BN99716G8967003V` | COMPLETED |
+| B (void) | Authorization | `1K327296R0055951P` | VOIDED (expires 2026-12-02T07:33:57Z) |
 
 ## Observations
 
-- [ ] Create order with `intent: AUTHORIZE` works
-- [ ] Buyer approval through the `payer-action` link works
-- [ ] Authorize returns an authorization ID; expiration time observed:
-- [ ] Full capture of the authorization works; capture status:
-- [ ] Void of an unused authorization works
-- [ ] Rerunning `finish` with the same `PayPal-Request-Id` makes no second payment
-- [ ] Business account sees only the captured amount
+- [x] Create order with `intent: AUTHORIZE` works (status `PAYER_ACTION_REQUIRED` until approved)
+- [x] Buyer approval through the `payer-action` link (`/checkoutnow?token=...`) works
+- [x] Authorize returns an authorization ID; `expiration_time` is **29 days** after authorization (2026-11-03 → 2026-12-02), matching the docs
+- [x] Full capture of the authorization works; capture status `COMPLETED` immediately, even with an SG payee and USD order
+- [x] Void of an unused authorization works; authorization reads back `VOIDED`
+- [x] PayPal fee is taken from the payee at capture: $40.00 gross → $1.66 fee → $38.34 net. The UI should show the worker the **net** amount from `seller_receivable_breakdown`, not assume gross.
+- [ ] Rerunning `finish` with the same `PayPal-Request-Id` makes no second payment (the script skips completed steps; a forced replay of the same request ID against PayPal is not yet tested)
+- [ ] Business account dashboard sees only the captured amount (not checked yet)
 
 ## Known limitations
 
