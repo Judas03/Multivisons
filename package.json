@@ -1,0 +1,22 @@
+{
+  "name": "multivisons",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AI-assisted milestone agreements and PayPal sandbox payments for independent projects.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @multivisons/web",
+    "dev:web": "npm run dev --workspace @multivisons/web",
+    "dev:worker": "npm run dev --workspace @multivisons/worker",
+    "build": "npm run build --workspace @multivisons/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "paypal:check": "node --env-file-if-exists=.env packages/payments/scripts/paypal-capability-check.ts"
+  },
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=10"
+  }
+}

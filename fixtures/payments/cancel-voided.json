@@ -1,0 +1,10 @@
+{
+  "_fixture": "Synthetic mock data. Unused milestone M2's authorization was voided on cancellation. UI: \"Cancelled, reservation released\".",
+  "paymentObservation": {
+    "status": "CONFIRMED",
+    "providerReference": "MOCK-AUTH-0005",
+    "providerStatus": "VOIDED",
+    "amount": { "currency": "USD", "amountMinor": 11000 },
+    "observedAt": "2026-11-05T11:00:00.000Z"
+  }
+}

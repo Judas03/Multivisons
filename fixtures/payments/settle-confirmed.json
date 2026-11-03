@@ -1,0 +1,10 @@
+{
+  "_fixture": "Synthetic mock data. M1 captured; this is settlement in mode AUTHORIZED_THEN_CAPTURED. UI: \"Paid\" with the capture ID as receipt.",
+  "paymentObservation": {
+    "status": "CONFIRMED",
+    "providerReference": "MOCK-CAPTURE-0003",
+    "providerStatus": "COMPLETED",
+    "amount": { "currency": "USD", "amountMinor": 4000 },
+    "observedAt": "2026-11-05T10:05:02.000Z"
+  }
+}
