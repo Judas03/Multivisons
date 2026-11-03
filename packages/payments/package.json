@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./mock": "./src/mock-gateway.ts",
-    "./gateway-types": "./src/gateway-types.ts"
+    "./gateway-types": "./src/gateway-types.ts",
+    "./paypal": "./src/paypal-gateway.ts"
   },
   "dependencies": {
     "@multivisons/contracts": "*"
