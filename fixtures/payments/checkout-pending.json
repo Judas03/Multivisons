@@ -1,0 +1,18 @@
+{
+  "_fixture": "Synthetic mock data, not a PayPal observation. Milestone M1 funded, buyer has not approved yet.",
+  "funding": {
+    "agreementId": "agr_demo",
+    "agreementVersion": 1,
+    "milestoneId": "m1",
+    "milestoneTitle": "Chatbot prototype",
+    "amount": { "currency": "USD", "amountMinor": 4000 },
+    "idempotencyKey": "agr_demo/v1/m1/fund/v1",
+    "returnUrl": "http://localhost:3000/funding/return",
+    "cancelUrl": "http://localhost:3000/funding/cancel"
+  },
+  "checkoutAction": {
+    "status": "PENDING",
+    "orderId": "MOCK-ORDER-0001",
+    "approveUrl": "http://localhost:3000/funding/return?token=MOCK-ORDER-0001&mock=1"
+  }
+}

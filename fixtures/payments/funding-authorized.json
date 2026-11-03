@@ -1,0 +1,12 @@
+{
+  "_fixture": "Synthetic mock data. Buyer approved and the order was authorized. UI label: \"Authorized, awaiting capture\".",
+  "fundingObservation": {
+    "status": "CONFIRMED",
+    "providerReference": "MOCK-AUTH-0002",
+    "providerStatus": "CREATED",
+    "amount": { "currency": "USD", "amountMinor": 4000 },
+    "authorizationId": "MOCK-AUTH-0002",
+    "authorizationExpiresAt": "2026-12-04T10:00:00.000Z",
+    "observedAt": "2026-11-05T10:00:00.000Z"
+  }
+}

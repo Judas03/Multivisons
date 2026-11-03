@@ -3,6 +3,15 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@multivisons/contracts": "*" }
+  "exports": {
+    ".": "./src/index.ts",
+    "./mock": "./src/mock-gateway.ts",
+    "./gateway-types": "./src/gateway-types.ts"
+  },
+  "dependencies": {
+    "@multivisons/contracts": "*"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.ts"
+  }
 }

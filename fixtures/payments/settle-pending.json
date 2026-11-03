@@ -1,0 +1,10 @@
+{
+  "_fixture": "Synthetic mock data. Client approved M1, capture sent, PayPal is holding it (or the outcome is still being reconciled). UI: \"Processing\".",
+  "paymentObservation": {
+    "status": "PENDING",
+    "providerReference": "MOCK-CAPTURE-0003",
+    "providerStatus": "PENDING",
+    "amount": { "currency": "USD", "amountMinor": 4000 },
+    "observedAt": "2026-11-05T10:05:00.000Z"
+  }
+}

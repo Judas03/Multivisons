@@ -1,0 +1,8 @@
+{
+  "_fixture": "Synthetic mock data. The capture request got no response. Outcome UNKNOWN until the worker reconciles with a GET. UI: \"Processing\", never \"Failed\".",
+  "paymentObservation": {
+    "status": "UNKNOWN",
+    "reasonCode": "NETWORK_ERROR",
+    "observedAt": "2026-11-05T10:05:00.000Z"
+  }
+}
