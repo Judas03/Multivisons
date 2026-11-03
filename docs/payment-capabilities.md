@@ -38,7 +38,8 @@ Output of `npm run paypal:check -- finish`. Statuses were read back with GET aft
 - [x] Full capture of the authorization works; capture status `COMPLETED` immediately, even with an SG payee and USD order
 - [x] Void of an unused authorization works; authorization reads back `VOIDED`
 - [x] PayPal fee is taken from the payee at capture: $40.00 gross → $1.66 fee → $38.34 net. The UI should show the worker the **net** amount from `seller_receivable_breakdown`, not assume gross.
-- [ ] Rerunning `finish` with the same `PayPal-Request-Id` makes no second payment (the script skips completed steps; a forced replay of the same request ID against PayPal is not yet tested)
+- [x] `PayPalGateway` smoke test (`npm run paypal:smoke`, 2026-11-03 13:39 UTC): order `2MH40615E74880717` → authorization `7US96246PA013552F` → capture `94E166757D389035B` COMPLETED. A second `settle()` with the same operation returned **the same capture** (no second payment), and `reconcile(authorization)` found that capture through the parent order.
+- [ ] A forced replay of the same `PayPal-Request-Id` straight to the capture endpoint is not yet tested (the gateway checks the authorization first, so it never sends one)
 - [ ] Business account dashboard sees only the captured amount (not checked yet)
 
 ## Known limitations
