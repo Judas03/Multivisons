@@ -2,7 +2,7 @@
 
 Goal: prove that PayPal sends us events (authorization created, capture completed), that we can **verify** them, and that the worker then reads the real status with a GET. No Next.js needed yet.
 
-You need **three Command Prompt windows**, all in your Multivisons folder (`cd %USERPROFILE%\Documents\Multivisons`).
+You need **three Command Prompt windows**, all in your Multivisons folder (`cd %USERPROFILE%\Documents\Multivisons`), with the latest `work/payments` pulled (`git pull origin work/payments`).
 
 ## One-time: install the tunnel tool
 
@@ -26,7 +26,6 @@ After a few seconds it prints a box with a URL like `https://random-words-here.t
 ## Window 2: register the webhook and listen
 
 ```
-git pull origin work/payments
 npm run paypal:webhook -- register https://random-words-here.trycloudflare.com
 ```
 
