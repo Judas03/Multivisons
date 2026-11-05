@@ -55,7 +55,7 @@ Within a few seconds to a few minutes (sandbox can be slow), lines like:
 
 ```
 [...] PAYMENT.AUTHORIZATION.CREATED  resource=7US...  -> HTTP 200 stored
-  GET authorization 7US...: CONFIRMED (CAPTURED)
+  GET authorization 7US...: CONFIRMED (COMPLETED)   <- reports the capture it led to
 [...] PAYMENT.CAPTURE.COMPLETED  resource=94E...  -> HTTP 200 stored
   GET capture 94E...: CONFIRMED (COMPLETED)
 ```
@@ -73,7 +73,11 @@ Copy everything from window 2 and send it to Claude.
 
 Each time you restart the tunnel you get a **new URL**, so run `register` again with it.
 
-## Not yet verified (the sandbox test answers these)
+## Verified 2026-11-05
 
-- Whether PayPal's `verify-webhook-signature` accepts the event after we parse and re-send it as JSON. PayPal compares against the original event, and re-serialising can occasionally break verification. If it fails, the fallback is to verify the signature locally with PayPal's certificate (CRC32 of the raw body plus a SHA256withRSA check).
+Real sandbox run: `CHECKOUT.ORDER.APPROVED`, `PAYMENT.AUTHORIZATION.CREATED` and `PAYMENT.CAPTURE.COMPLETED` all arrived within ~20 s, all passed `verify-webhook-signature` (HTTP 200 stored, none unverified), and each GET confirmed the status. See `payment-capabilities.md`.
+
+## Notes
+
+- PayPal's `verify-webhook-signature` accepted the parsed and re-sent events for the three types above. If a future event type ever fails verification, the fallback is to verify locally with PayPal's certificate (CRC32 of the raw body plus a SHA256withRSA check).
 - Events from the dashboard **Webhooks simulator** cannot be verified this way. Test with real sandbox payments as above, not the simulator. They also must never count as proof of money movement.
