@@ -13,3 +13,6 @@ coverage/
 .vscode/*.local.json
 uploads/
 tmp/
+
+# local tunnel tool for webhook testing
+cloudflared.exe
