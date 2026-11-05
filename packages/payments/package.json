@@ -7,7 +7,8 @@
     ".": "./src/index.ts",
     "./mock": "./src/mock-gateway.ts",
     "./gateway-types": "./src/gateway-types.ts",
-    "./paypal": "./src/paypal-gateway.ts"
+    "./paypal": "./src/paypal-gateway.ts",
+    "./webhooks": "./src/webhooks.ts"
   },
   "dependencies": {
     "@multivisons/contracts": "*"

@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { MockPaymentGateway } from "../../../packages/payments/src/mock-gateway.ts";
-import { InMemoryPaymentOperationStore, runReconcile, runSettle, runVoid } from "../src/payments/payment-jobs.ts";
+import { InMemoryPaymentOperationStore, runReconcile, runSettle, runVoid, runWebhookEvent } from "../src/payments/payment-jobs.ts";
 
 const USD = (amountMinor: number) => ({ currency: "USD" as const, amountMinor });
 
@@ -77,4 +77,48 @@ test("denied capture is FAILED, not retried", async () => {
   store.add(settleOp("op_1", await fundedMilestone(gw, "m1", 4000)));
   assert.equal((await runSettle(store, gw, "op_1")).state, "FAILED");
   assert.equal((await runReconcile(store, gw)).length, 0);
+});
+
+// ---------- webhook events ----------
+
+const ev = (eventType: string, resourceId: string, authorizationId?: string) => ({
+  eventId: `WH-${eventType}-${resourceId}`, eventType, resourceId, authorizationId, rawBody: "{}", receivedAt: "2026-11-05T10:00:00Z",
+});
+
+test("capture webhook confirms a PENDING settle after a GET; replaying it changes nothing", async () => {
+  const gw = new MockPaymentGateway({ scenario: "lost_response" });
+  const store = new InMemoryPaymentOperationStore();
+  const auth = await fundedMilestone(gw, "m1", 4000);
+  store.add(settleOp("op_1", auth));
+  assert.equal((await runSettle(store, gw, "op_1")).state, "UNKNOWN");
+
+  const capId = (await gw.reconcile({ kind: "authorization", providerReference: auth })).providerReference!;
+  const r = await runWebhookEvent(store, gw, ev("PAYMENT.CAPTURE.COMPLETED", capId, auth));
+  assert.equal(r.outcome, "applied");
+  assert.equal(r.operations[0].state, "CONFIRMED");
+  assert.equal(r.operations[0].providerReference, capId);
+
+  const again = await runWebhookEvent(store, gw, ev("PAYMENT.CAPTURE.COMPLETED", capId, auth));
+  assert.deepEqual(again.operations, r.operations);
+});
+
+test("stale or unknown webhooks never move a settled milestone backwards", async () => {
+  const gw = new MockPaymentGateway();
+  const store = new InMemoryPaymentOperationStore();
+  const auth = await fundedMilestone(gw, "m1", 4000);
+  store.add(settleOp("op_1", auth));
+  await runSettle(store, gw, "op_1");
+  const r = await runWebhookEvent(store, gw, ev("PAYMENT.AUTHORIZATION.CREATED", auth, auth));
+  assert.equal(r.operations[0].state, "CONFIRMED");
+  assert.equal((await runWebhookEvent(store, gw, ev("PAYMENT.CAPTURE.COMPLETED", "X", "MOCK-AUTH-9999"))).outcome, "unmatched");
+});
+
+test("refund or reversal after settlement is flagged, not hidden", async () => {
+  const gw = new MockPaymentGateway();
+  const store = new InMemoryPaymentOperationStore();
+  const auth = await fundedMilestone(gw, "m1", 4000);
+  store.add(settleOp("op_1", auth));
+  await runSettle(store, gw, "op_1");
+  const r = await runWebhookEvent(store, gw, ev("PAYMENT.CAPTURE.REVERSED", "CAPX", auth));
+  assert.equal(r.outcome, "financial_exception");
 });

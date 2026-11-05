@@ -45,4 +45,5 @@ Output of `npm run paypal:check -- finish`. Statuses were read back with GET aft
 ## Known limitations
 
 - An authorization is honored for 3 days and valid for up to 29 days. The demo finishes within the honor period, so reauthorization is out of scope.
-- Webhooks are not yet configured (planned step 4).
+- Webhooks: verified in sandbox on 2026-11-05 through a Cloudflare quick tunnel (webhook `0NB594620E297184H`, since replaced by each new tunnel). Order `4KY667183E6337630` → authorization `4FT12641YA475460C` → capture `3T1425681N552304E`. Events `CHECKOUT.ORDER.APPROVED`, `PAYMENT.AUTHORIZATION.CREATED` and `PAYMENT.CAPTURE.COMPLETED` arrived in about 20 s, all passed PayPal signature verification, and each was confirmed by GET. The smoke test in the same run passed again (second settle returned the same capture).
+- The app needs a stable public URL (staging) for webhooks in the demo. A quick tunnel URL changes every run.

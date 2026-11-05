@@ -14,6 +14,7 @@ import type {
   PaymentObservation,
   ProposedPaymentGateway,
 } from "@multivisons/payments/gateway-types";
+import type { StoredWebhookEvent } from "@multivisons/payments/webhooks";
 
 type Money = Readonly<{ currency: "USD"; amountMinor: number }>;
 
@@ -45,6 +46,8 @@ export interface PaymentOperationStore {
   record(id: string, obs: PaymentObservation, nextState: OperationState): Promise<PaymentOperation>;
   /** Operations in PENDING or UNKNOWN (or IN_FLIGHT for too long) that need a GET. */
   listNeedingReconcile(olderThan: string): Promise<PaymentOperation[]>;
+  /** Operations for one PayPal authorization (used to match webhook events). */
+  findByAuthorizationId(authorizationId: string): Promise<PaymentOperation[]>;
 }
 
 const MAX_ATTEMPTS = 5;
@@ -107,6 +110,50 @@ export async function runReconcile(store: PaymentOperationStore, gateway: Propos
   return out;
 }
 
+export type WebhookJobResult = Readonly<{
+  eventId: string;
+  outcome: "applied" | "unmatched" | "financial_exception" | "provider_unknown" | "ignored";
+  operations: JobResult[];
+}>;
+
+/**
+ * Process one stored, verified webhook event. The event is only a hint: we GET the
+ * authoritative status first, so duplicates, stale events and out-of-order delivery
+ * cannot move an operation backwards (record() never downgrades CONFIRMED).
+ */
+export async function runWebhookEvent(
+  store: PaymentOperationStore,
+  gateway: ProposedPaymentGateway,
+  event: StoredWebhookEvent,
+): Promise<WebhookJobResult> {
+  const base = { eventId: event.eventId };
+  if (!event.authorizationId) return { ...base, outcome: event.eventType === "CHECKOUT.ORDER.APPROVED" ? "ignored" : "unmatched", operations: [] };
+
+  const ops = await store.findByAuthorizationId(event.authorizationId);
+  if (ops.length === 0) return { ...base, outcome: "unmatched", operations: [] }; // quarantine: not one of ours, or not stored yet
+
+  if (event.eventType === "PAYMENT.CAPTURE.REFUNDED" || event.eventType === "PAYMENT.CAPTURE.REVERSED") {
+    // Money came back after settlement. Don't erase history: surface it for a human.
+    return { ...base, outcome: "financial_exception", operations: ops.map(result) };
+  }
+
+  const isCapture = event.eventType.startsWith("PAYMENT.CAPTURE.");
+  const obs = await gateway.reconcile(
+    isCapture ? { kind: "capture", providerReference: event.resourceId } : { kind: "authorization", providerReference: event.authorizationId },
+  );
+  if (obs.status === "UNKNOWN") return { ...base, outcome: "provider_unknown", operations: ops.map(result) }; // retry the event later
+
+  const updated: JobResult[] = [];
+  for (const op of ops) {
+    if (op.state === "CONFIRMED") { updated.push(result(op)); continue; }
+    let state: OperationState | null = null;
+    if (op.kind === "SETTLE" && isCapture) state = obs.status === "CONFIRMED" ? "CONFIRMED" : obs.status === "PENDING" ? "PENDING" : "FAILED";
+    if (op.kind === "VOID" && obs.providerStatus === "VOIDED") state = "CONFIRMED";
+    updated.push(result(state ? await store.record(op.id, obs, state) : op));
+  }
+  return { ...base, outcome: "applied", operations: updated };
+}
+
 function nextState(obs: PaymentObservation, attempts: number): OperationState {
   if (obs.status === "CONFIRMED") return "CONFIRMED";
   if (obs.status === "PENDING") return "PENDING";
@@ -160,6 +207,10 @@ export class InMemoryPaymentOperationStore implements PaymentOperationStore {
     };
     this.ops.set(id, updated);
     return updated;
+  }
+
+  async findByAuthorizationId(authorizationId: string) {
+    return [...this.ops.values()].filter((o) => o.authorizationId === authorizationId);
   }
 
   async listNeedingReconcile(olderThan: string) {
