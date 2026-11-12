@@ -1,21 +1,15 @@
 {
   "name": "multivisons",
   "private": true,
-  "version": "0.1.0",
-  "description": "AI-assisted milestone agreements and PayPal sandbox payments for independent projects.",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "version": "0.2.0",
+  "description": "MERN workspace for jointly accepted agreements, digital signatures and milestone approvals.",
+  "workspaces": ["server", "client"],
   "scripts": {
-    "dev": "npm run dev --workspace @multivisons/web",
-    "dev:web": "npm run dev --workspace @multivisons/web",
-    "dev:worker": "npm run dev --workspace @multivisons/worker",
-    "build": "npm run build --workspace @multivisons/web",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "dev": "concurrently -n api,web -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "test": "npm run test -w server"
   },
-  "engines": {
-    "node": ">=24 <25",
-    "npm": ">=10"
-  }
+  "devDependencies": { "concurrently": "^9.1.0" },
+  "engines": { "node": ">=20", "npm": ">=10" }
 }

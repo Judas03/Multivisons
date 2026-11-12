@@ -1,0 +1,38 @@
+.grid.stats { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.stat { display: flex; gap: 14px; align-items: center; padding: 16px 18px; }
+.stat.warn { border-color: #e7c36a; background: #fffbf0; }
+.stat-ico { width: 40px; height: 40px; border-radius: 10px; background: var(--brand); color: var(--accent); display: grid; place-items: center; flex: none; }
+.stat-val { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.stat-label { font-size: 0.85rem; color: var(--ink-2); font-weight: 600; }
+.stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stage { display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.stage strong { font-size: 1.3rem; }
+
+.tabs.wide { max-width: 520px; }
+.toolbar { gap: 10px; }
+.search { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; background: #fff; }
+.search input { border: 0; padding: 10px 0; outline: none; }
+.toolbar select { width: auto; }
+.admin-row .right { text-align: right; }
+.table-wrap { overflow-x: auto; padding: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-2); background: #f7faf9; }
+tr:last-child td { border-bottom: 0; }
+
+.back { align-self: flex-start; padding-left: 0; }
+.steps-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.step { display: flex; gap: 12px; }
+.step-rail { display: flex; flex-direction: column; align-items: center; }
+.step-dot { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #e7ecea; color: var(--ink-2); flex: none; }
+.step-line { flex: 1; width: 2px; background: var(--line); min-height: 14px; }
+.step-body { padding-bottom: 14px; }
+.step.done .step-dot { background: var(--ok); color: #fff; }
+.step.done .step-line { background: var(--ok); }
+.step.current .step-dot { background: var(--accent); color: var(--ink); }
+.step.current .step-dot svg { animation: spin 1.6s linear infinite; }
+.step.pending { opacity: 0.6; }
+.step.warn .step-dot { background: #d99a00; color: #fff; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.party { display: flex; flex-direction: column; gap: 2px; }
+@media (prefers-reduced-motion: reduce) { .step.current .step-dot svg { animation: none; } }
